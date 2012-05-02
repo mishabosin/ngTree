@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:ng="http://angularjs.org">
+<head>
+    <script src="http://code.angularjs.org/angular-1.0.0rc7.min.js"></script>
+    <script src="AngularTree.js"></script>
+
+    <script type="text/javascript">
+        var testCtrl = function($scope, $log) {
+            $scope.node = {
+                name: "root",
+                childNodes : [
+                    {
+                        name: "branch1",
+                        childNodes: [
+                            { name: "branch11", childNodes: [] },
+                            { name: "branch12", childNodes: [] }
+                        ]
+                    },{
+                        name: "branch3",
+                        childNodes: [
+                            { name: "last", childNodes: [] },
+                            { name: "branch21", childNodes: [] },
+                            { name: "branch22", childNodes: [] }
+                        ]
+                    },{
+                        name: "branch2",
+                        childNodes: []
+                    }
+                ]
+            };
+
+            $scope.modNodeName = function(nodeData) {
+                nodeData.name += "+change";
+            };
+
+            $scope.addChild = function(nodeData) {
+                var newNode = {
+                    name: 'NewNode',
+                    childNodes: []
+                };
+                nodeData.childNodes.push(newNode);
+            };
+        }
+    </script>
+</head>
+
+<body ng-app="TreeModule">
+<div ng-controller="testCtrl">
+
+    <ul>
+        <li ng-tree="node" node-children="childNodes" node-order="name">
+            <div>
+                {{node.name}},
+                <a ng:click='modNodeName(node)'>Change</a>
+                <a ng:click='addChild(node)'>Add</a>
+            </div>
+            <ul>
+                <ng-tree-child></ng-tree-child>
+            </ul>
+        </li>
+    </ul>
+
+</div>
+</body>
+</html>
