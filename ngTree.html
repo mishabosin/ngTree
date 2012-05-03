@@ -8,7 +8,7 @@
         var testCtrl = function($scope, $log) {
             $scope.node = {
                 name: "root",
-                childNodes : [
+                childNodes: [
                     {
                         name: "branch1",
                         childNodes: [
@@ -28,17 +28,44 @@
                     }
                 ]
             };
+            makeDoubleLinkedTree($scope.node);
+            /**
+             * Make sure each node has a reference to the parent.
+             * @param node
+             */
+            function makeDoubleLinkedTree(node) {
+                var i, numOfChildren;
+                if (typeof node.childNodes != 'undefined') {
+                    numOfChildren = node.childNodes.length;
+                    for (i = 0; i < numOfChildren; i++) {
+                        node.childNodes[i].parent = node;
+                        makeDoubleLinkedTree(node.childNodes[i]);
+                    }
+                }
+            }
 
             $scope.modNodeName = function(nodeData) {
                 nodeData.name += "+change";
             };
-
             $scope.addChild = function(nodeData) {
                 var newNode = {
                     name: 'NewNode',
-                    childNodes: []
+                    childNodes: [],
+                    parent: nodeData
                 };
                 nodeData.childNodes.push(newNode);
+            };
+            $scope.removeChild = function(nodeData) {
+                // Find the list of siblings that this node should be removed from
+                var siblings = nodeData.parent.childNodes;
+                var i = 0;
+                for (i; i < siblings.length; i++) {
+                    // Scan the siblings and remove the unwanted child
+                    if (siblings[i] === nodeData) {
+                        siblings.splice(i, 1);
+                        break;
+                    }
+                }
             };
         }
     </script>
@@ -53,6 +80,7 @@
                 {{node.name}},
                 <a ng:click='modNodeName(node)'>Change</a>
                 <a ng:click='addChild(node)'>Add</a>
+                <a ng:click='removeChild(node)'>Remove</a>
             </div>
             <ul>
                 <ng-tree-child></ng-tree-child>
