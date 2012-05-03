@@ -28,7 +28,6 @@ angular.module('TreeModule', []).directive('ngTree', function($compile) {
                 scope.$watch(treeExp, function(parentNode){
                     var childrenHtml;
                     if (parentNode) {
-                        if (childScope) childScope.$destroy();
                         childScope = scope.$new();
                         childScope[treeExp] = parentNode;
 
