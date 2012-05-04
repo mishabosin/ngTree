@@ -12,6 +12,8 @@
  * @param nodeChildren - the property of the root object that contains the child elements.
  *      Expected to reference an array of objects.
  * @param nodeOrder - used by ngRepeat to set the order in which the nodes are displayed
+ *
+ * @author mishabosin
  */
 angular.module('TreeModule', []).directive('ngTree', function($compile) {
     return {
