@@ -3,14 +3,14 @@
  * @name ngTree
  *
  * @description
- * The `ngTree` directive instantiates a template once per item for a tree based structure.
- * Each template instance gets its own scope, where the given loop variable is set to the
- * current collection item.
+ * The `ngTree` directive instantiates a template once per node in a tree based structure.
+ * Each child within a node instantiates this template as well, and recursion continues until
+ * a node with no children is encountered.
  *
  * @element ANY
- * @param ngTree - the top level (root) object to
+ * @param ngTree - the top level node (root) object
  * @param nodeChildren - the property of the root object that contains the child elements.
- *      Has to reference an array of objects.
+ *      Expected to reference an array of objects.
  * @param nodeOrder - used by ngRepeat to set the order in which the nodes are displayed
  */
 angular.module('TreeModule', []).directive('ngTree', function($compile) {
@@ -20,33 +20,25 @@ angular.module('TreeModule', []).directive('ngTree', function($compile) {
         compile: function(element, attr, linker) {
             return function(scope, parentElement, attr) {
                 var treeExp = attr.ngTree;
-                // TODO: validate the expressions
                 var childrenExp = attr.nodeChildren;
                 var orderExp = attr.nodeOrder;
-                var childScope;
 
                 scope.$watch(treeExp, function(parentNode){
-                    var childrenHtml;
-                    if (parentNode) {
+                    var childrenHtml,
+                        repeaterExp,
+                        repeater,
                         childScope = scope.$new();
                         childScope[treeExp] = parentNode;
 
-                        // Construct the branch html
-                        if (parentNode[childrenExp] == null) {
-                            // No children - this is a terminal node
-                            childrenHtml = "";
-                        } else {
-                            // Construct a repeater for the children
-                            var repeaterString = "<span ng-repeat='"+treeExp+" in "+treeExp+"."+childrenExp+" | orderBy:"+'"'+orderExp+'"'+"'></span>";
-                            var $repeater = angular.element(repeaterString);
-                            // Inject the provided template into the repeater to initiate the recursion
-                            childrenHtml = $repeater.append(parentElement.clone());
-                        }
+                        // Construct a repeater for the possible children
+                        repeaterExp = "<span ng-repeat='"+treeExp+" in "+treeExp+"."+childrenExp+" | orderBy:"+'"'+orderExp+'"'+"'></span>";
+                        repeater = angular.element(repeaterExp);
+                        // Inject the provided template into the repeater.
+                        childrenHtml = repeater.append(parentElement.clone());
 
                         // Add and compile the result
                         parentElement.find("ng-tree-child").replaceWith(childrenHtml);
                         $compile(parentElement.contents())(childScope);
-                    }
                 });
             };
         }

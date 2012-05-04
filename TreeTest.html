@@ -3,7 +3,9 @@
 <head>
     <script src="http://code.angularjs.org/angular-1.0.0rc7.min.js"></script>
     <script src="AngularTree.js"></script>
-
+    <style>
+        a { text-decoration: none; }
+    </style>
     <script type="text/javascript">
         var testCtrl = function($scope, $log) {
             $scope.node = {
@@ -28,7 +30,7 @@
                     }
                 ]
             };
-            makeDoubleLinkedTree($scope.node);
+
             /**
              * Make sure each node has a reference to the parent.
              * @param node
@@ -43,6 +45,7 @@
                     }
                 }
             }
+            makeDoubleLinkedTree($scope.node);
 
             $scope.modNodeName = function(nodeData) {
                 nodeData.name += "+change";
@@ -56,38 +59,41 @@
                 nodeData.childNodes.push(newNode);
             };
             $scope.removeChild = function(nodeData) {
-                // Find the list of siblings that this node should be removed from
-                var siblings = nodeData.parent.childNodes;
-                var i = 0;
-                for (i; i < siblings.length; i++) {
-                    // Scan the siblings and remove the unwanted child
+                var i, siblings;
+                if (nodeData.parent == null) {
+                    //This must be the root node
+                    return;
+                }
+                // Scan the list of siblings and remove the target node
+                siblings = nodeData.parent.childNodes;
+                for (i = 0; i < siblings.length; i++) {
                     if (siblings[i] === nodeData) {
                         siblings.splice(i, 1);
                         break;
                     }
                 }
             };
-        }
+        };
     </script>
 </head>
 
-<body ng-app="TreeModule">
-<div ng-controller="testCtrl">
-
-    <ul>
-        <li ng-tree="node" node-children="childNodes" node-order="name">
-            <div>
-                {{node.name}},
-                <a ng:click='modNodeName(node)'>Change</a>
-                <a ng:click='addChild(node)'>Add</a>
-                <a ng:click='removeChild(node)'>Remove</a>
-            </div>
-            <ul>
-                <ng-tree-child></ng-tree-child>
-            </ul>
-        </li>
-    </ul>
-
+<body>
+<div ng-app="TreeModule">
+    <div ng-controller="testCtrl">
+        <ul>
+            <li ng-tree="node" node-children="childNodes" node-order="name">
+                <div>
+                    {{node.name}},
+                    <a ng:click='modNodeName(node)'>(change)</a>
+                    <a ng:click='addChild(node)'>(+)</a>
+                    <a ng:click='removeChild(node)'>(-)</a>
+                </div>
+                <ul>
+                    <ng-tree-child></ng-tree-child>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
