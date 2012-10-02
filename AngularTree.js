@@ -30,17 +30,23 @@ angular.module('TreeModule', []).directive('ngTree', function($compile) {
                         repeaterExp,
                         repeater,
                         childScope = scope.$new();
-                        childScope[treeExp] = parentNode;
+                    childScope[treeExp] = parentNode;
 
-                        // Construct a repeater for the possible children
-                        repeaterExp = "<span ng-repeat='"+treeExp+" in "+treeExp+"."+childrenExp+" | orderBy:"+'"'+orderExp+'"'+"'></span>";
-                        repeater = angular.element(repeaterExp);
-                        // Inject the provided template into the repeater.
-                        childrenHtml = repeater.append(parentElement.clone());
+                    // Construct a repeater for the possible children
+                    repeaterExp = "<span ng-repeat='"+treeExp+" in "+treeExp+"."+childrenExp+" | orderBy:"+'"'+orderExp+'"'+"'></span>";
+                    repeater = angular.element(repeaterExp);
+                    // Inject the provided template into the repeater.
+                    childrenHtml = repeater.append(parentElement.clone());
 
-                        // Add and compile the result
+                    // Add and compile the result
+                    if (parentElement.find("ng-tree-child").length > 0) {
+                        // Support modern browsers: <ng-tree-child></ng-tree-child>
                         parentElement.find("ng-tree-child").replaceWith(childrenHtml);
-                        $compile(parentElement.contents())(childScope);
+                    } else if (parentElement.find("[ng-tree-child]").length > 0) {
+                        // Support ie browsers: <div ng-tree-child></>
+                        parentElement.find("[ng-tree-child]").replaceWith(childrenHtml);
+                    }
+                    $compile(parentElement.contents())(childScope);
                 });
             };
         }
